@@ -187,15 +187,6 @@ use PHPUnit\Framework\TestCase;
 trait TestTrait
 {
     /**
-     * Property reflection
-     *
-     * This property store a cache of PropertyReflection
-     *
-     * @var \ArrayObject
-     */
-    private $propertyReflections;
-
-    /**
      * Call
      *
      * Interpretion hook for use TestCase methods
@@ -206,14 +197,7 @@ trait TestTrait
      * @throws \LogicException in case of unexisting method
      * @return mixed
      */
-    public function __call(string $methodName, array $arguments)
-    {
-        if (method_exists($this->getTestCase(), $methodName)) {
-            return call_user_func_array([$this->getTestCase(), $methodName], $arguments);
-        }
-
-        throw new \LogicException(sprintf('Calling unexistant method "%s"', $methodName));
-    }
+    public abstract function __call(string $methodName, array $arguments);
 
     /**
      * Create empty instance
@@ -222,11 +206,7 @@ trait TestTrait
      *
      * @return object
      */
-    protected function createEmptyInstance()
-    {
-        $reflex = new \ReflectionClass($this->getTestedInstance());
-        return $reflex->newInstanceWithoutConstructor();
-    }
+    protected abstract function createEmptyInstance();
 
     /**
      * Set value
@@ -241,15 +221,7 @@ trait TestTrait
      * @throws \LogicException If the property cannot be resolved into the inheritance tree
      * @return $this
      */
-    protected function setValue($instance, string $property, $value)
-    {
-        if (!is_object($instance)) {
-            throw new \LogicException('Cannot set value into non object');
-        }
-
-        $this->getPropertyReflection(get_class($instance), $property)->setValue($instance, $value);
-        return $this;
-    }
+    protected abstract function setValue($instance, string $property, $value);
 
     /**
      * Get value
@@ -263,14 +235,7 @@ trait TestTrait
      * @throws \LogicException If the property cannot be resolved into the inheritance tree
      * @return mixed
      */
-    protected function getValue($instance, string $property)
-    {
-        if (!is_object($instance)) {
-            throw new \LogicException('Cannot get value from non object');
-        }
-
-        return $this->getPropertyReflection(get_class($instance), $property)->getValue($instance);
-    }
+    protected abstract function getValue($instance, string $property);
 
     /**
      * Get property reflection
@@ -284,25 +249,10 @@ trait TestTrait
      * @throws \LogicException If the property cannot be resolved into the inheritance tree
      * @return \ReflectionProperty
      */
-    private function getPropertyReflection(string $instanceClassName, string $property) : \ReflectionProperty
-    {
-        $cacheKey = sprintf('%s::%s', $instanceClassName, $property);
-        if (null === $this->propertyReflections) {
-            $this->propertyReflections = new \ArrayObject();
-        }
-
-        if ($this->propertyReflections->offsetExists($cacheKey)) {
-            return $this->propertyReflections->offsetGet($cacheKey);
-        }
-
-        $reflex = $this->createPropertyReflection($instanceClassName, $property);
-
-        if (!$reflex) {
-            throw new \LogicException(sprintf('Property "%s" cannot be resolved', $property));
-        }
-        $this->propertyReflections->offsetSet($cacheKey, $reflex);
-        return $reflex;
-    }
+    protected abstract function getPropertyReflection(
+        string $instanceClassName,
+        string $property
+    ) : \ReflectionProperty;
 
     /**
      * Create property reflection
@@ -315,23 +265,10 @@ trait TestTrait
      *
      * @return \ReflectionProperty|NULL
      */
-    private function createPropertyReflection(string $instanceClassName, string $property) : ?\ReflectionProperty
-    {
-        $reflectionClass = new \ReflectionClass($instanceClassName);
-
-        if ($reflectionClass->hasProperty($property)) {
-            $propertyReflection = $reflectionClass->getProperty($property);
-            $propertyReflection->setAccessible(true);
-            return $propertyReflection;
-        }
-
-        $parentClass = $reflectionClass->getParentClass();
-        if (!$parentClass) {
-            return null;
-        }
-
-        return $this->createPropertyReflection($parentClass->getName(), $property);
-    }
+    protected abstract function createPropertyReflection(
+        string $instanceClassName,
+        string $property
+    ) : ?\ReflectionProperty;
 
     /**
      * Get tested instance

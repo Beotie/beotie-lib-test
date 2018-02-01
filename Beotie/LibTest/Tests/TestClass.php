@@ -18,6 +18,7 @@ namespace Beotie\LibTest\Tests;
 
 use Beotie\LibTest\Traits\TestTrait;
 use PHPUnit\Framework\TestCase;
+use Beotie\LibTest\Traits\TestCaseTrait;
 
 /**
  * Test class
@@ -32,7 +33,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TestClass
 {
-    use TestTrait;
+    use TestTrait, TestCaseTrait;
 
     /**
      * Tested instance
