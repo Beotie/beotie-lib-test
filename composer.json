@@ -1,0 +1,31 @@
+{
+	"name" : "beotie/lib_test",
+	"description" : "This package provide a set of class and traits to be used in test cases",
+	"type" : "library",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "matthieu vallance",
+			"email" : "matthieu.vallance@cscfa.fr"
+		}
+	],
+	"minimum-stability" : "dev",
+	"require" : {
+		"phpunit/phpunit" : "^6.3@stable"
+	},
+	"require-dev" : {
+		"phpmd/phpmd" : "^2.6@stable",
+		"squizlabs/php_codesniffer" : "^3.0@stable",
+		"sebastian/phpcpd" : "^3.0@stable",
+		"phpmetrics/phpmetrics" : "^2.2@stable"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Beotie\\LibTest\\" : "Beotie/LibTest"
+		}
+	},
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
